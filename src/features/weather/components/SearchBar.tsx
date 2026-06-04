@@ -140,7 +140,7 @@ export function SearchBar({ onSelect }: SearchBarProps) {
         >
           {results.length === 0 ? (
             <Text style={[styles.noResults, { color: palette.textMuted }]}>
-              Sin resultados para "{debouncedQuery}"
+              Sin resultados para {debouncedQuery}
             </Text>
           ) : (
             results.map((result) => {
@@ -199,7 +199,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '600',
-    outlineStyle: 'none',
   },
   error: {
     fontSize: 13,

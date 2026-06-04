@@ -19,9 +19,10 @@ interface HourlyItem {
 export function HourlyForecast({ forecast }: HourlyForecastProps) {
   const { palette } = useTheme();
   const { hourly, hourly_units, timezone } = forecast;
+  const currentTime = forecast.current.time;
 
   const hours = useMemo(() => {
-    const now = new Date(forecast.current.time);
+    const now = new Date(currentTime);
     const startIndex = hourly.time.findIndex((time) => new Date(time) >= now);
     const from = startIndex >= 0 ? startIndex : 0;
     const items: HourlyItem[] = [];
@@ -37,7 +38,7 @@ export function HourlyForecast({ forecast }: HourlyForecastProps) {
     }
 
     return items;
-  }, [forecast.current.time, hourly]);
+  }, [currentTime, hourly]);
 
   const timeFormatter = new Intl.DateTimeFormat('es', {
     hour: '2-digit',
