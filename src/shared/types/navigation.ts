@@ -11,9 +11,3 @@ export type RootStackParamList = {
   Auth: undefined;
   Main: undefined;
 };
-
-declare global {
-  namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList {}
-  }
-}
