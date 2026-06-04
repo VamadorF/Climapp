@@ -2,6 +2,31 @@ import type { ForecastResponse, GeocodingResponse } from './types';
 
 const GEOCODING_BASE = 'https://geocoding-api.open-meteo.com/v1/search';
 const FORECAST_BASE = 'https://api.open-meteo.com/v1/forecast';
+const NETWORK_RETRIES = 3;
+
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithRetry(url: string): Promise<Response> {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < NETWORK_RETRIES; attempt += 1) {
+    try {
+      return await fetch(url);
+    } catch (error) {
+      lastError = error;
+
+      if (attempt < NETWORK_RETRIES - 1) {
+        await wait(300 * (attempt + 1));
+      }
+    }
+  }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error('No se pudo conectar con Open-Meteo.');
+}
 
 async function parseJsonResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -36,7 +61,7 @@ export async function searchCity(query: string): Promise<GeocodingResponse> {
     format: 'json',
   });
 
-  const response = await fetch(`${GEOCODING_BASE}?${params.toString()}`);
+  const response = await fetchWithRetry(`${GEOCODING_BASE}?${params.toString()}`);
 
   return parseJsonResponse<GeocodingResponse>(response);
 }
@@ -76,7 +101,7 @@ export async function getForecast(
     ].join(','),
   });
 
-  const response = await fetch(`${FORECAST_BASE}?${params.toString()}`);
+  const response = await fetchWithRetry(`${FORECAST_BASE}?${params.toString()}`);
 
   return parseJsonResponse<ForecastResponse>(response);
 }
